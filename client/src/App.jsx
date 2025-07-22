@@ -33,6 +33,21 @@ function App() {
     setActiveChallenge(challenges[randomIndex]);
   };
 
+  const vote = async (id, type) => {
+    try {
+      const res = await axios.post(`https://golf-strat-roulette.onrender.com/api/vote/${id}`, { vote: type });
+      // Falls Challenge gelöscht wurde (bei 10 Downvotes)
+      if (res.data.deleted) {
+        setActiveChallenge(null);
+        fetchChallenges();
+      } else {
+        setActiveChallenge(res.data); // Aktualisierte Challenge anzeigen
+      }
+    } catch (error) {
+      console.error('Fehler beim Voten:', error);
+    }
+  };
+
   useEffect(() => {
     fetchChallenges();
   }, []);
@@ -48,6 +63,10 @@ function App() {
       {activeChallenge && (
         <div className="active-challenge">
           <h2>{activeChallenge.text}</h2>
+          <div className="votes">
+            <button onClick={() => vote(activeChallenge._id, 'up')}>👍 {activeChallenge.upvotes}</button>
+            <button onClick={() => vote(activeChallenge._id, 'down')}>👎 {activeChallenge.downvotes}</button>
+          </div>
         </div>
       )}
 
@@ -60,20 +79,6 @@ function App() {
         />
         <button onClick={addChallenge}>Hinzufügen</button>
       </div>
-
-      {/* Challenge-Liste ist ausgeblendet
-      <ul>
-        {challenges.map((challenge) => (
-          <li key={challenge._id} className="challenge">
-            <span>{challenge.text}</span>
-            <div className="votes">
-              <button onClick={() => vote(challenge._id, 'up')}>👍 {challenge.upvotes}</button>
-              <button onClick={() => vote(challenge._id, 'down')}>👎 {challenge.downvotes}</button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      */}
     </div>
   );
 }
