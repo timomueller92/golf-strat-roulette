@@ -7,7 +7,7 @@ function App() {
   const [newChallenge, setNewChallenge] = useState('');
 
   const fetchChallenges = async () => {
-    const res = await axios.get('http://localhost:5000/api/challenges');
+    const res = await axios.get('https://golf-strat-roulette.onrender.com/api/challenges');
     setChallenges(res.data);
   };
 
