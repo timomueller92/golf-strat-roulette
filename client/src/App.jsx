@@ -5,22 +5,32 @@ import axios from 'axios';
 function App() {
   const [challenges, setChallenges] = useState([]);
   const [newChallenge, setNewChallenge] = useState('');
+  const [activeChallenge, setActiveChallenge] = useState(null);
 
   const fetchChallenges = async () => {
-    const res = await axios.get('https://golf-strat-roulette.onrender.com/api/challenges');
-    setChallenges(res.data);
+    try {
+      const res = await axios.get('https://golf-strat-roulette.onrender.com/api/challenges');
+      setChallenges(res.data);
+    } catch (error) {
+      console.error('Fehler beim Laden der Challenges:', error);
+    }
   };
 
   const addChallenge = async () => {
     if (!newChallenge.trim()) return;
-    await axios.post('https://golf-strat-roulette.onrender.com/api/challenges', { text: newChallenge });
-    setNewChallenge('');
-    fetchChallenges();
+    try {
+      await axios.post('https://golf-strat-roulette.onrender.com/api/challenges', { text: newChallenge });
+      setNewChallenge('');
+      fetchChallenges();
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Challenge:', error);
+    }
   };
 
-  const vote = async (id, type) => {
-    await axios.post(`https://golf-strat-roulette.onrender.com/api/vote/${id}`, { vote: type });
-    fetchChallenges();
+  const getRandomChallenge = () => {
+    if (challenges.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * challenges.length);
+    setActiveChallenge(challenges[randomIndex]);
   };
 
   useEffect(() => {
@@ -30,6 +40,16 @@ function App() {
   return (
     <div className="app">
       <h1>Golf Strat Roulette</h1>
+
+      <button onClick={getRandomChallenge} className="random-button">
+        🎲 Nächste Challenge
+      </button>
+
+      {activeChallenge && (
+        <div className="active-challenge">
+          <h2>{activeChallenge.text}</h2>
+        </div>
+      )}
 
       <div className="form">
         <input
@@ -41,6 +61,7 @@ function App() {
         <button onClick={addChallenge}>Hinzufügen</button>
       </div>
 
+      {/* Challenge-Liste ist ausgeblendet
       <ul>
         {challenges.map((challenge) => (
           <li key={challenge._id} className="challenge">
@@ -52,6 +73,7 @@ function App() {
           </li>
         ))}
       </ul>
+      */}
     </div>
   );
 }
