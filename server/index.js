@@ -26,10 +26,20 @@ app.get("/api/challenges", async (req, res) => {
 });
 
 app.post("/api/challenges", async (req, res) => {
-  const newChallenge = new Challenge({ text: req.body.text });
-  await newChallenge.save();
-  res.json(newChallenge);
+  try {
+    const { text } = req.body;
+    if (!text || text.trim() === "") {
+      return res.status(400).json({ message: "Text darf nicht leer sein" });
+    }
+    const newChallenge = new Challenge({ text });
+    await newChallenge.save();
+    res.status(201).json(newChallenge);
+  } catch (err) {
+    console.error("❌ Fehler beim Hinzufügen:", err.message);
+    res.status(500).json({ message: "Serverfehler" });
+  }
 });
+
 
 app.post("/api/vote/:id", async (req, res) => {
   const { vote } = req.body;
