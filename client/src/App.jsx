@@ -13,13 +13,13 @@ function App() {
 
   const addChallenge = async () => {
     if (!newChallenge.trim()) return;
-    await axios.post('http://localhost:5000/api/challenges', { text: newChallenge });
+    await axios.post('https://golf-strat-roulette.onrender.com/api/challenges', { text: newChallenge });
     setNewChallenge('');
     fetchChallenges();
   };
 
   const vote = async (id, type) => {
-    await axios.post(`http://localhost:5000/api/vote/${id}`, { vote: type });
+    await axios.post(`https://golf-strat-roulette.onrender.com/api/vote/${id}`, { vote: type });
     fetchChallenges();
   };
 
